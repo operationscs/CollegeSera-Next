@@ -1,0 +1,13 @@
+export { default as AdmissionProcessTable } from "./AdmissionProcessTable";
+export { default as CoursesAndFees } from "./CoursesAndFees";
+export { default as CoursesTable } from "./CoursesTable";
+export { default as FacilitiesTable } from "./FacilitiesTable";
+export { default as FeeOverview } from "./FeeOverview";
+export { default as NewsArticles } from "./NewsArticles";
+export { default as PlacementsTable } from "./PlacementsTable";
+export { default as RankingsTable } from "./RankingsTable";
+export { default as ReviewList, type DatabaseReview } from "./ReviewList";
+export * from "./CollegeTabViews";
+export * from "./CollegeDetailClient";
+export { COLLEGE_TABS } from "@/data/college-details";
+export type { CollegeTabId } from "@/types/college-details";

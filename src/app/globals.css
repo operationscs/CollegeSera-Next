@@ -1,0 +1,489 @@
+/* src/index.css - FULL copy-paste (fixed: no @apply border-border) */
+
+
+
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------
+   BASE DESIGN TOKENS (Works with DaisyUI)
+------------------------------------------- */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    /* Extra color palette for your orange + blue brand */
+    --orange-50: 255 247 237;
+    --orange-100: 255 237 213;
+    --orange-500: 249 115 22;
+    --orange-600: 234 88 12;
+
+    --blue-50: 239 246 255;
+    --blue-600: 37 99 235;
+    --blue-700: 29 78 216;
+    --blue-800: 30 64 175;
+  }
+
+  /* DARK MODE */
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
+  /* ------------------------------------------
+     GLOBAL DEFAULTS (no @apply issues)
+  ------------------------------------------- */
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  }
+}
+
+/* ------------------------------------------
+   UTILITIES + ANIMATIONS  
+------------------------------------------- */
+@layer utilities {
+  /* Hover lift */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Glass effect */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .city-picker-scrollbar {
+    scrollbar-color: #f97316 transparent;
+    scrollbar-width: thin;
+  }
+  .city-picker-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .city-picker-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .city-picker-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #f97316;
+    border-radius: 9999px;
+  }
+  .dark .city-picker-scrollbar {
+    scrollbar-color: #fb923c transparent;
+  }
+  .dark .city-picker-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #fb923c;
+  }
+}
+
+/* ------------------------------------------
+   KEYFRAMES
+------------------------------------------- */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Floating subtle premium bubbles */
+.float-bubble {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 9999px;
+  filter: blur(30px);
+  animation: float 7s ease-in-out infinite;
+}
+
+.float-bubble.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.float-bubble.delay-700 {
+  animation-delay: 0.7s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-30px);
+    opacity: 1;
+  }
+}
+
+/* Typewriter cursor */
+.typing-cursor {
+  display: inline-block;
+  width: 8px;
+  background: #ffa447;
+  margin-left: 4px;
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Homepage-only typography system */
+:where(.homepage-typography),
+:where(.homepage-typography-header),
+:where(.homepage-typography-footer) {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+
+:where(.homepage-typography) h1,
+:where(.homepage-typography) h2,
+:where(.homepage-typography) h3,
+:where(.homepage-typography) h4,
+:where(.homepage-typography) h5,
+:where(.homepage-typography) h6,
+:where(.homepage-typography-header) h1,
+:where(.homepage-typography-header) h2,
+:where(.homepage-typography-header) h3,
+:where(.homepage-typography-header) h4,
+:where(.homepage-typography-header) h5,
+:where(.homepage-typography-header) h6,
+:where(.homepage-typography-footer) h1,
+:where(.homepage-typography-footer) h2,
+:where(.homepage-typography-footer) h3,
+:where(.homepage-typography-footer) h4,
+:where(.homepage-typography-footer) h5,
+:where(.homepage-typography-footer) h6 {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+}
+
+:where(.homepage-typography) h1 {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+:where(.homepage-typography) h2 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+:where(.homepage-typography) h3 {
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+:where(.homepage-typography) h4 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+:where(.homepage-typography) h5 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+:where(.homepage-typography) p,
+:where(.homepage-typography) label,
+:where(.homepage-typography) input,
+:where(.homepage-typography) textarea,
+:where(.homepage-typography) select,
+:where(.homepage-typography) td,
+:where(.homepage-typography) th {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+
+:where(.homepage-typography) p {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+:where(.homepage-typography) button,
+:where(.homepage-typography) [role="button"] {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:where(.homepage-typography) input,
+:where(.homepage-typography) textarea,
+:where(.homepage-typography) select {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+:where(.homepage-typography) label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+:where(.homepage-typography) td,
+:where(.homepage-typography) th {
+  font-size: 14px;
+}
+
+:where(.homepage-typography) th {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+:where(.homepage-typography-header) nav a,
+:where(.homepage-typography-header) [role="menu"] a,
+:where(.homepage-typography-header) [role="menuitem"],
+:where(.homepage-typography-header) button {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:where(.homepage-typography-header) [role="menu"] p,
+:where(.homepage-typography-header) [role="menu"] span,
+:where(.homepage-typography-header) input {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+
+:where(.homepage-typography-header) [role="menu"] p {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+:where(.homepage-typography-header) input {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+:where(.homepage-typography-footer) h3,
+:where(.homepage-typography-footer) h4 {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+:where(.homepage-typography-footer) a,
+:where(.homepage-typography-footer) p,
+:where(.homepage-typography-footer) span,
+:where(.homepage-typography-footer) input,
+:where(.homepage-typography-footer) button {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+:where(.homepage-typography-footer) button {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+}
+
+:where(.homepage-typography-footer) input::placeholder {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  :where(.homepage-typography) h1 {
+    font-size: 48px;
+  }
+
+  :where(.homepage-typography) h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 639px) {
+  :where(.homepage-typography) h1 {
+    font-size: 36px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :where(.homepage-typography) h1 {
+    font-size: 56px;
+  }
+
+  :where(.homepage-typography) h2 {
+    font-size: 32px;
+  }
+
+  :where(.homepage-typography) h3 {
+    font-size: 24px;
+  }
+
+  :where(.homepage-typography) h4 {
+    font-size: 20px;
+  }
+}
+
+/* Responsive sizing for role-based typography utilities */
+@media (min-width: 768px) {
+  .typography-hero-heading {
+    font-size: clamp(48px, 4vw, 56px);
+  }
+
+  .typography-page-heading {
+    font-size: clamp(36px, 3.2vw, 44px);
+  }
+
+  .typography-section-heading {
+    font-size: clamp(28px, 2.3vw, 32px);
+  }
+
+  .typography-subsection-heading {
+    font-size: clamp(22px, 1.8vw, 24px);
+  }
+
+  .typography-card-heading {
+    font-size: clamp(18px, 1.5vw, 20px);
+  }
+
+  .typography-statistic {
+    font-size: clamp(24px, 2.7vw, 36px);
+  }
+}
