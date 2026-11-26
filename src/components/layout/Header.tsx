@@ -39,10 +39,14 @@ export const Header: React.FC<HeaderProps> = ({ colleges: propColleges }) => {
     setMobileOpen(false);
   };
 
-  const search = useSearchLogic(generateSuggestions, () => {
-    closeImmediate();
-    setMobileOpen(false);
-  });
+  const search = useSearchLogic(
+    generateSuggestions,
+    () => {
+      closeImmediate();
+      setMobileOpen(false);
+    },
+    (query: string) => `/colleges?${new URLSearchParams({ search: query }).toString()}`
+  );
 
   const handleBlurWithDropdown = (e: React.FocusEvent<HTMLInputElement>) => {
     setTimeout(() => {
@@ -112,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({ colleges: propColleges }) => {
               type="submit"
               size="icon"
               aria-label="Search"
-              className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full bg-orange-600 text-white shadow-sm transition-all duration-200 hover:scale-105 hover:bg-orange-700"
+              className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full bg-[#ff861c] text-white shadow-sm transition-all duration-200 hover:scale-105 hover:bg-[#e67310]"
             >
               <Search className="h-3.5 w-3.5" />
             </Button>
@@ -128,7 +132,8 @@ export const Header: React.FC<HeaderProps> = ({ colleges: propColleges }) => {
               isLoading={search.isLoading}
               selectedIndex={search.selectedIndex}
               onSuggestionClick={search.handleSuggestionClick}
-              className="right-0 left-auto min-w-[320px] sm:min-w-[380px]"
+              variant="compact"
+              className="w-full"
             />
           </form>
         </div>

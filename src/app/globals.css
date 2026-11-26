@@ -135,10 +135,6 @@
     background-clip: text;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   .animate-fade-in {
     animation: fadeIn 0.6s ease-out forwards;
   }
@@ -411,7 +407,7 @@
 :where(.homepage-typography-footer) span,
 :where(.homepage-typography-footer) input,
 :where(.homepage-typography-footer) button {
-  font-family: var(--font-inter), "Inter", sans-serif;
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
   font-size: 13px;
   font-weight: 400;
 }

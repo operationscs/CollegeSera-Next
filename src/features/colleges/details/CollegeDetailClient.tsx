@@ -26,12 +26,32 @@ export function useCollegeApplyModal() {
 export function CollegeDetailClientProvider({ children }: { children: React.ReactNode }) {
   const [isUserFormOpen, setIsUserFormOpen] = useState(false);
   const { openBooking } = useBooking();
+  const pathname = usePathname() || "";
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openApplyModal = useCallback(() => {
     setIsUserFormOpen(true);
     if (idleTimer.current) clearTimeout(idleTimer.current);
   }, []);
+
+  // Ensure navigating to a college microsite page from the homepage starts at the top of the page
+  useEffect(() => {
+    const isSubTabRoute = /\/college\/[^/]+\/[^/]+/.test(pathname);
+    if (!isSubTabRoute) {
+      const scrollToTop = () => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      };
+      scrollToTop();
+      const rafId = requestAnimationFrame(scrollToTop);
+      const timerId = setTimeout(scrollToTop, 50);
+      return () => {
+        cancelAnimationFrame(rafId);
+        clearTimeout(timerId);
+      };
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const resetIdleTimer = () => {

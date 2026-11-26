@@ -1,34 +1,82 @@
-import { Card } from "@/components/ui/card";
-import { HOME_CITIES } from "@/data/homepage";
+"use client";
 
-export const CitiesSection = () => {
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { CITIES_SECTION_CONTENT, TOP_CITIES_DATA } from "@/data/top-cities";
+import { CitiesHeader } from "@/components/homepage-components/cities-components/CitiesHeader";
+import { CitiesSlider } from "@/components/homepage-components/cities-components/CitiesSlider";
+import type { CitiesSectionContent, HomeCity } from "@/types/home";
+
+export interface CitiesSectionProps {
+  cities?: HomeCity[];
+  content?: CitiesSectionContent;
+}
+
+export const CitiesSection: React.FC<CitiesSectionProps> = ({
+  cities = TOP_CITIES_DATA,
+  content = CITIES_SECTION_CONTENT,
+}) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      setCanScrollPrev(false);
+      setCanScrollNext(false);
+      return;
+    }
+
+    setCanScrollPrev(container.scrollLeft > 2);
+    setCanScrollNext(
+      container.scrollLeft + container.clientWidth < container.scrollWidth - 2
+    );
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateScrollState();
+    container.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [cities, updateScrollState]);
+
+  const handleScroll = (direction: -1 | 1) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const firstCard =
+      container.querySelector<HTMLElement>("[data-city-card]");
+    const step = firstCard ? firstCard.offsetWidth + 20 : 280;
+
+    container.scrollBy({
+      left: direction * step,
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <div className="bg-gray-50 py-16 dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="mb-8 text-3xl font-bold text-slate-900 dark:text-slate-100">
-          Top <span className="text-orange-500">Cities</span>
-        </h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {HOME_CITIES.map((city) => (
-            <Card key={city.name} className="group cursor-pointer overflow-hidden border-slate-200 bg-white transition-shadow hover:shadow-lg dark:border-slate-700 dark:bg-slate-900">
-              <div className="relative">
-                <img
-                  src={city.image}
-                  alt={city.name}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-bold">{city.name}</h3>
-                  <p className="text-sm opacity-90">{city.colleges}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+    <section className="bg-[#FAF8F6] py-8 dark:bg-slate-950 sm:py-10 md:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <CitiesHeader content={content} />
+
+        <CitiesSlider
+          cities={cities}
+          content={content}
+          scrollContainerRef={scrollContainerRef}
+          onScrollPrev={() => handleScroll(-1)}
+          onScrollNext={() => handleScroll(1)}
+          canScrollPrev={canScrollPrev}
+          canScrollNext={canScrollNext}
+        />
       </div>
-    </div>
+    </section>
   );
 };
 

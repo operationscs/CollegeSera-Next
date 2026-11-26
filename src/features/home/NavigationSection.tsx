@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Navitems } from "@/data/navitems";
 export const NavigationSection = () => {
   return (
-    <div className="bg-gray-50 py-12 dark:bg-slate-950">
+    <div className="bg-[#FAF8F6] py-8 dark:bg-slate-950 sm:py-10 md:py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="mb-2 text-3xl font-bold text-gray-900 dark:text-slate-100">

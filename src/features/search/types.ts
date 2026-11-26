@@ -13,8 +13,10 @@ export interface SearchAutocompleteProps {
   inputClassName?: string;
   showIcon?: boolean;
   onSearch?: (query: string) => void;
+  onEmptySubmit?: () => void;
   searchPathBuilder?: (query: string) => string;
   variant?: 'hero' | 'header';
   formId?: string;
   colleges?: any[];
+  collegeOnlySuggestions?: boolean;
 }

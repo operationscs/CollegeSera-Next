@@ -1,82 +1,94 @@
-import React from "react";
-import Link from "next/link";
-import { BookOpen } from "lucide-react";
-import { HOME_STREAMS } from "@/data/homepage";
+"use client";
 
-export const StreamsSection: React.FC = () => {
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HOME_STREAMS, STREAMS_SECTION_CONTENT } from "@/data/homepage";
+import { StreamsSectionHeader } from "@/components/homepage-components/streamsection-components/StreamsSectionHeader";
+import { StreamsGrid } from "@/components/homepage-components/streamsection-components/StreamsGrid";
+import type {
+  HomeStream,
+  StreamFilterId,
+  StreamsSectionContent,
+} from "@/types/home";
+
+export interface StreamsSectionProps {
+  content?: StreamsSectionContent;
+  streams?: HomeStream[];
+}
+
+export const StreamsSection: React.FC<StreamsSectionProps> = ({
+  content = STREAMS_SECTION_CONTENT,
+  streams = HOME_STREAMS,
+}) => {
+  const [selectedFilter, setSelectedFilter] = useState<StreamFilterId>("all");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const filteredStreams = useMemo(() => {
+    if (selectedFilter === "all") return streams;
+    return streams.filter((stream) => stream.category === selectedFilter);
+  }, [streams, selectedFilter]);
+
+  const updateScrollState = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    setCanScrollPrev(container.scrollLeft > 2);
+    setCanScrollNext(
+      container.scrollLeft + container.clientWidth < container.scrollWidth - 2
+    );
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateScrollState();
+    container.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [filteredStreams, updateScrollState]);
+
+  const handleSelectFilter = (filterId: StreamFilterId) => {
+    setSelectedFilter(filterId);
+    scrollContainerRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+  };
+
+  const handleScroll = (direction: -1 | 1) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const firstCard = container.querySelector<HTMLElement>("[data-stream-card]");
+    const step = firstCard ? firstCard.offsetWidth + 20 : 320;
+
+    container.scrollBy({
+      left: direction * step,
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <section className="bg-white py-16 dark:bg-slate-950 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-50 px-4 py-1.5 text-sm font-semibold text-orange-600 dark:bg-orange-950/50 dark:text-orange-300">
-            <BookOpen className="w-4 h-4" />
-            Browse by Stream
-          </span>
-          <h2 className="mb-3 text-3xl font-bold text-slate-900 dark:text-slate-100 md:text-4xl">
-            Explore Colleges by <span className="text-orange-600">Stream</span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-base text-slate-600 dark:text-slate-300 md:text-lg">
-            Find the best colleges across 16+ popular streams. Compare courses, fees, and placements.
-          </p>
-        </div>
-
-        {/* Streams Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-5">
-          {HOME_STREAMS.map((stream) => (
-            <Link
-              key={stream.name}
-              href={stream.path}
-              className={`
-                group relative flex flex-col items-center justify-center p-5 md:p-6 rounded-2xl border
-                ${stream.bgColor}
-                dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800
-                transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
-              `}
-            >
-              {/* Icon */}
-              <div
-                className={`
-                  w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-3
-                  bg-white shadow-sm dark:bg-slate-800 ${stream.color}
-                  group-hover:scale-110 transition-transform duration-300
-                `}
-              >
-                <stream.icon className="h-7 w-7" />
-              </div>
-
-              {/* Name */}
-              <h3 className="mb-1 text-center text-sm font-semibold leading-tight text-slate-800 dark:text-slate-100 md:text-base">
-                {stream.name}
-              </h3>
-
-              {/* College count */}
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 md:text-xs">
-                {stream.colleges}
-              </p>
-
-              {/* Hover arrow */}
-              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* View All CTA */}
-        <div className="text-center mt-10">
-          <Link
-            href="/colleges"
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-colors hover:bg-slate-800 hover:shadow-xl dark:bg-slate-800 dark:hover:bg-slate-700"
-          >
-            View All Streams & Colleges
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
-        </div>
+    <section className="bg-[#FAF8F6] py-8 dark:bg-slate-950 sm:py-10 md:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <StreamsSectionHeader
+          content={content}
+          selectedFilter={selectedFilter}
+          onSelectFilter={handleSelectFilter}
+        />
+        <StreamsGrid
+          streams={filteredStreams}
+          scrollContainerRef={scrollContainerRef}
+          onScrollPrev={() => handleScroll(-1)}
+          onScrollNext={() => handleScroll(1)}
+          canScrollPrev={canScrollPrev}
+          canScrollNext={canScrollNext}
+          prevButtonLabel={content.prevButtonLabel}
+          nextButtonLabel={content.nextButtonLabel}
+        />
       </div>
     </section>
   );

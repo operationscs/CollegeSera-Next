@@ -16,16 +16,21 @@ export const SearchAutocomplete = ({
   inputClassName = "",
   showIcon = true,
   onSearch,
+  onEmptySubmit,
   searchPathBuilder,
   variant = "hero",
   formId,
   colleges: propColleges,
+  collegeOnlySuggestions = false,
 }: SearchAutocompleteProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const colleges = useSearchColleges(propColleges);
-  const generateSuggestions = useSuggestionGenerator(colleges);
+  const isHero = variant === "hero";
+  const generateSuggestions = useSuggestionGenerator(colleges, {
+    collegeOnly: collegeOnlySuggestions || isHero,
+  });
 
   const {
     query,
@@ -39,7 +44,9 @@ export const SearchAutocomplete = ({
     handleSubmit,
     handleFocus,
     handleBlur,
-  } = useSearchLogic(generateSuggestions, onSearch, searchPathBuilder);
+  } = useSearchLogic(generateSuggestions, onSearch, searchPathBuilder, {
+    onEmptySubmit,
+  });
 
   const handleBlurWithDropdown = (e: React.FocusEvent) => {
     setTimeout(() => {
@@ -79,7 +86,7 @@ export const SearchAutocomplete = ({
 
       <SearchDropdown
         ref={dropdownRef}
-        isOpen={isOpen && (query.trim().length >= 1 || suggestions.length > 0)}
+        isOpen={isOpen && query.trim().length >= 1}
         query={query}
         suggestions={suggestions}
         isLoading={isLoading}

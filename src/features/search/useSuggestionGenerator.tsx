@@ -51,17 +51,40 @@ const matchesCollegeQuery = (college: DatabaseCollege, normalizedQuery: string):
   );
 };
 
-export const useSuggestionGenerator = (colleges: DatabaseCollege[]) => {
+export const useSuggestionGenerator = (
+  colleges: DatabaseCollege[],
+  options?: { collegeOnly?: boolean; showInitialColleges?: boolean }
+) => {
+  const collegeOnly = options?.collegeOnly ?? false;
+  const showInitialColleges = options?.showInitialColleges ?? false;
+
   return useMemo(() => {
     const generateSuggestions = (searchQuery: string): SearchSuggestion[] => {
       const trimmed = (searchQuery || "").trim();
-      if (!trimmed) return [];
+      const suggestions: SearchSuggestion[] = [];
+      const seen = new Set<string>();
+
+      // When focused with empty query in hero mode, show the filtered colleges directly
+      if (!trimmed) {
+        if (!showInitialColleges) return [];
+        colleges.forEach((college) => {
+          if (!college?.name || seen.has(college.name)) return;
+          const formattedSlug = formatSlug(college.slug);
+          if (formattedSlug) {
+            suggestions.push({
+              id: formattedSlug,
+              text: college.name,
+              type: "college",
+              icon: <Building2 className="w-4 h-4 text-blue-500 shrink-0" />,
+            });
+            seen.add(college.name);
+          }
+        });
+        return suggestions.slice(0, 12);
+      }
 
       const normQuery = normalizeSearchText(trimmed);
       if (!normQuery) return [];
-
-      const suggestions: SearchSuggestion[] = [];
-      const seen = new Set<string>();
 
       // 1. College names (letter-by-letter & word-by-word progressive matching)
       const { matchedColleges } = findMatchingColleges(colleges, trimmed);
@@ -82,6 +105,10 @@ export const useSuggestionGenerator = (colleges: DatabaseCollege[]) => {
           seen.add(college.name);
         }
       });
+
+      if (collegeOnly) {
+        return suggestions.slice(0, 12);
+      }
 
       // 2. Locations
       const locations = [...new Set(colleges.map(c => c?.location).filter(Boolean))];

@@ -43,6 +43,72 @@ import {
 } from "@/data/homepage";
 import type { HeroCityId, HeroStreamId } from "@/types/home";
 
+const AnimatedStatValue = ({ value }: { value: string }) => {
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const match = value.match(/^(\d+)(.*)$/);
+  const target = match ? parseInt(match[1], 10) : 0;
+  const suffix = match ? match[2] : "";
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [displayNumber, setDisplayNumber] = useState<string>("0");
+
+  useEffect(() => {
+    const element = spanRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasAnimated(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!hasAnimated || !match) return;
+
+    let frameId: number;
+    const duration = 1200;
+    const startTime = performance.now();
+    const useDecimals = target > 0 && target < 10;
+
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = eased * target;
+
+      if (progress >= 1) {
+        setDisplayNumber(String(target));
+      } else if (useDecimals) {
+        setDisplayNumber(current.toFixed(1));
+      } else {
+        setDisplayNumber(String(Math.round(current)));
+      }
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, [hasAnimated, target]);
+
+  if (!match) return <>{value}</>;
+
+  return (
+    <span ref={spanRef}>
+      {displayNumber}
+      {suffix}
+    </span>
+  );
+};
+
 export const HeroSection = () => {
   const router = useRouter();
   const colleges = useSearchColleges();
@@ -234,7 +300,7 @@ export const HeroSection = () => {
   return (
     <section
       id="hero-section"
-      className="relative isolate bg-white dark:bg-slate-950"
+      className="relative isolate bg-[#FAF8F6] dark:bg-slate-950"
     >
       <div
         aria-hidden="true"
@@ -257,31 +323,28 @@ export const HeroSection = () => {
         {/* Bottom fade */}
         <div
           className="absolute inset-x-0 bottom-0 h-28
-    bg-gradient-to-b from-transparent to-white
+    bg-gradient-to-b from-transparent to-[#FAF8F6]
     dark:to-slate-950"
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1664px] px-4 pb-2 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-[84px]">
+      <div className="relative mx-auto max-w-[1664px] px-4 pb-8 pt-24 sm:px-6 sm:pb-10 sm:pt-28 md:pb-12 lg:px-8 lg:pt-[84px]">
         <div className="mx-auto mt-10 flex max-w-4xl flex-col items-center text-center">
-          <h1
-            style={{ fontSize: "42px" }}
-            className="font-extrabold leading-[1.05] tracking-tight text-slate-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.65)] dark:text-slate-100"
-          >
+          <h1 className="w-full !text-[22px] font-extrabold leading-[1.12] tracking-tight text-[#065893] drop-shadow-[0_1px_0_rgba(255,255,255,0.65)] dark:text-slate-100 dark:drop-shadow-none sm:!text-[34px] md:!text-[42px] md:leading-[1.05]">
             <span className="block">
               South India&apos;s Most Trusted
               <span className="block">Platform</span>
             </span>
-            <span className="block">
+            <span className="block min-h-[1.15em] whitespace-nowrap">
               For{" "}
               <span
-                className="text-orange-600 dark:text-orange-400"
+                className="text-[#ff861c] dark:text-[#ff861c]"
                 aria-live="off"
               >
                 {displayedText}
               </span>
               <span
-                className="animate-pulse text-orange-600 dark:text-orange-400"
+                className="animate-pulse text-[#ff861c] dark:text-[#ff861c]"
                 aria-hidden="true"
               >
                 |
@@ -289,7 +352,7 @@ export const HeroSection = () => {
             </span>
           </h1>
 
-          <p className="mt-3 text-xs font-semibold text-orange-600 dark:text-orange-400 sm:text-sm">
+          <p className="mt-3 text-xs font-semibold text-[#ff861c] dark:text-[#ff861c] sm:text-sm">
             South India&apos;s Most Trusted College Discovery Platform
           </p>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-600 dark:text-slate-300 sm:text-sm">
@@ -324,8 +387,8 @@ export const HeroSection = () => {
                     onClick={() => setSelectedStream(stream.id)}
                     className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-colors sm:text-xs ${
                       selectedStream === stream.id
-                        ? "border-orange-500 bg-orange-500 text-white shadow-sm"
-                        : "border-transparent bg-slate-50 text-slate-700 hover:border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+                        ? "border-[#ff861c] bg-[#ff861c] text-white shadow-sm"
+                        : "border-transparent bg-slate-50 text-[#065893] hover:border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-white"
                     }`}
                   >
                     {stream.label}
@@ -356,6 +419,8 @@ export const HeroSection = () => {
                   className="w-full"
                   colleges={filteredSearchColleges}
                   searchPathBuilder={buildSearchPath}
+                  onEmptySubmit={handleExplore}
+                  collegeOnlySuggestions={true}
                   inputClassName="h-11 rounded-xl !border-0 !bg-transparent py-0 pl-10 pr-3 text-xs text-slate-800 shadow-none placeholder:text-slate-400 focus-visible:ring-0 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm"
                 />
               </div>
@@ -370,7 +435,7 @@ export const HeroSection = () => {
                     aria-expanded={cityPickerOpen}
                     className="h-11 w-full justify-between gap-2 rounded-xl border-slate-200 bg-white px-3 text-xs font-normal text-slate-700 shadow-none hover:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
-                    <MapPin className="h-4 w-4 shrink-0 text-orange-500" />
+                    <MapPin className="h-4 w-4 shrink-0 text-[#ff861c]" />
 
                     <span className="min-w-0 flex-1 truncate text-left">
                       {HERO_CITY_OPTIONS.find((city) => city.value === selectedCity)
@@ -406,7 +471,7 @@ export const HeroSection = () => {
                             className="cursor-pointer"
                           >
                             <Check
-                              className={`mr-2 h-4 w-4 text-orange-600 ${
+                              className={`mr-2 h-4 w-4 text-[#ff861c] ${
                                 selectedCity === city.value
                                   ? "opacity-100"
                                   : "opacity-0"
@@ -425,7 +490,7 @@ export const HeroSection = () => {
               <Button
                 type="submit"
                 form="home-hero-search"
-                className="h-11 w-full gap-2 rounded-xl bg-orange-500 px-5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 sm:w-auto"
+                className="h-11 w-full gap-2 rounded-xl bg-[#ff861c] px-5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#e67310] sm:w-auto"
               >
                 <Search className="h-3.5 w-3.5" />
                 Search
@@ -439,11 +504,11 @@ export const HeroSection = () => {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
             </span>
             <p className="text-[10px] font-medium text-slate-700 dark:text-slate-200 sm:text-xs">
-              <span className="font-bold text-orange-600 dark:text-orange-400">
+              <span className="font-bold text-[#ff861c] dark:text-[#ff861c]">
                 {currentProof.count}
               </span>{" "}
               students searched{" "}
-              <span className="font-semibold text-orange-600 dark:text-orange-400">
+              <span className="font-semibold text-[#ff861c] dark:text-[#ff861c]">
                 {currentProof.college}
               </span>{" "}
               in the last hour
@@ -451,8 +516,8 @@ export const HeroSection = () => {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
-            <span className="mr-1 text-[9px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:text-[10px]">
-              <Flame className="mr-1 inline h-3 w-3 text-orange-500" />
+            <span className="mr-1 text-[9px] font-semibold uppercase tracking-wider text-[#065893] dark:text-slate-400 sm:text-[10px]">
+              <Flame className="mr-1 inline h-3 w-3 text-[#ff861c]" />
               Trending Searches
             </span>
             {HERO_TRENDING_SEARCHES.map((search) => (
@@ -460,7 +525,7 @@ export const HeroSection = () => {
                 key={search}
                 type="button"
                 onClick={() => handleTrendingSearch(search)}
-                className="rounded-full border border-white bg-white/80 px-2.5 py-1 text-[9px] font-medium text-slate-700 shadow-sm transition-colors hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-800 dark:hover:bg-slate-700 dark:hover:text-orange-300 sm:text-[10px]"
+                className="rounded-full border border-white bg-white/80 px-2.5 py-1 text-[9px] font-medium text-[#065893] shadow-sm transition-colors hover:border-[#ff861c]/40 hover:bg-[#FFF3E8] hover:text-[#ff861c] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-800 dark:hover:bg-slate-700 dark:hover:text-orange-300 sm:text-[10px]"
               >
                 {search}
               </button>
@@ -472,7 +537,7 @@ export const HeroSection = () => {
           <Button
             type="button"
             onClick={handleExplore}
-            className="h-11 w-full gap-2 rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 sm:w-auto"
+            className="h-11 w-full gap-2 rounded-xl bg-[#ff861c] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#e67310] sm:w-auto"
           >
             Explore All Colleges
             <ArrowRight className="h-4 w-4" />
@@ -480,7 +545,7 @@ export const HeroSection = () => {
           <Button
             asChild
             variant="default"
-            className="h-11 w-full lg:mb-0 md:mb-0 mb-3  rounded-xl border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 shadow-sm hover:bg-white dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:w-auto"
+            className="h-11 w-full lg:mb-0 md:mb-0 mb-3 rounded-xl border-slate-300 bg-white px-6 text-sm font-semibold text-[#065893] shadow-sm hover:bg-[#E8F3FB] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:w-auto"
           >
             <Link href="/exams">View All Exams</Link>
           </Button>
@@ -495,7 +560,7 @@ export const HeroSection = () => {
               aria-label="Scroll statistics left"
               disabled={!canScrollStatsLeft}
               onClick={() => scrollStats(-1)}
-              className="h-8 w-8 shrink-0 rounded-full border-slate-300 bg-white p-0 text-slate-700 shadow-sm hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-300 sm:hidden"
+              className="h-8 w-8 shrink-0 rounded-full border-slate-300 bg-white p-0 text-slate-700 shadow-sm hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 focus-visible:ring-1 focus-visible:ring-[#ff861c] focus-visible:ring-offset-0 disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-300 sm:hidden"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -524,7 +589,7 @@ export const HeroSection = () => {
                     </span>
                     <span className="min-w-0 text-left">
                       <span className="block text-2xl font-bold leading-tight text-slate-900 dark:text-slate-100 sm:text-2xl lg:text-3xl">
-                        {stat.value}
+                        <AnimatedStatValue value={stat.value} />
                       </span>
                       <span className="block text-sm leading-tight text-slate-500 dark:text-slate-400 sm:text-xs lg:text-sm">
                         {stat.label}
@@ -546,7 +611,7 @@ export const HeroSection = () => {
               aria-label="Scroll statistics right"
               disabled={!canScrollStatsRight}
               onClick={() => scrollStats(1)}
-              className="h-8 w-8 shrink-0 rounded-full border-slate-300 bg-white p-0 text-slate-700 shadow-sm hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-300 sm:hidden"
+              className="h-8 w-8 shrink-0 rounded-full border-slate-300 bg-white p-0 text-slate-700 shadow-sm hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 focus-visible:ring-1 focus-visible:ring-[#ff861c] focus-visible:ring-offset-0 disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-700 dark:hover:bg-orange-950 dark:hover:text-orange-300 sm:hidden"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

@@ -86,7 +86,7 @@ export function MobileNavigation({
             )}
             <button
               type="submit"
-              className="ml-2 shrink-0 rounded-lg bg-orange-600 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
+              className="ml-2 shrink-0 rounded-lg bg-[#ff861c] px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#e67310]"
             >
               Search
             </button>
@@ -102,6 +102,7 @@ export function MobileNavigation({
             isLoading={search.isLoading}
             selectedIndex={search.selectedIndex}
             onSuggestionClick={search.handleSuggestionClick}
+            variant="compact"
           />
         </form>
 
@@ -137,8 +138,8 @@ export function MobileNavigation({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white"
             style={{
-              background: "linear-gradient(135deg,#f97316,#ef4444)",
-              boxShadow: "0 4px 14px rgba(249,115,22,0.4)",
+              background: "linear-gradient(to left,#d46508,#ff861c)",
+              boxShadow: "0 4px 14px rgba(255,134,28,0.4)",
             }}
           >
             <svg

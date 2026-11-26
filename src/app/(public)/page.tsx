@@ -4,11 +4,11 @@ import JsonLd from "@/components/shared/JsonLd";
 import HeroSection from "@/features/home/HeroSection";
 import StreamsSection from "@/features/home/StreamsSection";
 import FeaturedColleges from "@/features/home/FeaturedColleges";
-import StatsSection from "@/features/home/StatsSection";
 import PopularCourses from "@/features/home/popularCourses";
-import NavigationSection from "@/features/home/NavigationSection";
 import ExamsSection from "@/features/home/ExamsSection";
 import CitiesSection from "@/features/home/CitiesSection";
+import GuidanceComparisonSection from "@/features/home/GuidanceComparisonSection";
+import FaqSection from "@/features/home/FaqSection";
 import { getHomepageFeaturedColleges } from "@/services/collegeService";
 
 export const revalidate = 300;
@@ -51,16 +51,16 @@ export default async function HomePage() {
   const featuredColleges = await getHomepageFeaturedColleges().catch(() => []);
 
   return (
-    <div className="homepage-typography min-h-screen bg-white dark:bg-slate-950">
+    <div className="homepage-typography min-h-screen bg-[#FAF8F6] dark:bg-slate-950">
       <JsonLd data={homeSchema} />
       <HeroSection />
       <StreamsSection />
       <FeaturedColleges colleges={featuredColleges} />
-      <StatsSection />
       <PopularCourses />
-      <NavigationSection />
       <ExamsSection />
       <CitiesSection />
+      <GuidanceComparisonSection />
+      <FaqSection />
     </div>
   );
 }

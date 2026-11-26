@@ -92,7 +92,7 @@ export async function getHomepageFeaturedColleges(): Promise<DatabaseCollege[]> 
   try {
     const { data, error } = await supabase
       .from('colleges')
-      .select('*')
+      .select('*, courses(*), placements(*), rankings(*), admission_process(*)')
       .eq('homepage_featured', true)
       .limit(9);
 

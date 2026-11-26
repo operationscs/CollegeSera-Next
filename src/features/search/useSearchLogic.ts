@@ -8,27 +8,37 @@ import { getCleanCollegeSlug } from "@/utils/collegeUrl";
 export const useSearchLogic = (
   generateSuggestions: (query: string) => SearchSuggestion[],
   onSearch?: (query: string) => void,
-  searchPathBuilder?: (query: string) => string
+  searchPathBuilder?: (query: string) => string,
+  options?: { showSuggestionsOnEmptyFocus?: boolean; onEmptySubmit?: () => void }
 ) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const showSuggestionsOnEmptyFocus = options?.showSuggestionsOnEmptyFocus ?? false;
+  const onEmptySubmit = options?.onEmptySubmit;
 
   const router = useRouter();
 
   // Compute suggestions synchronously letter-by-letter as the user types
   const suggestions = useMemo(() => {
-    if (query.trim().length < 1) {
+    if (query.trim().length < 1 && !showSuggestionsOnEmptyFocus) {
       return [];
     }
     return generateSuggestions(query);
-  }, [query, generateSuggestions]);
+  }, [query, generateSuggestions, showSuggestionsOnEmptyFocus]);
 
   const isLoading = false;
 
   const handleSearch = (searchQuery: string) => {
     const trimmed = searchQuery.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      if (onEmptySubmit) {
+        onEmptySubmit();
+        setIsOpen(false);
+        setSelectedIndex(-1);
+      }
+      return;
+    }
 
     const slug = trimmed
       .toLowerCase()
@@ -51,7 +61,7 @@ export const useSearchLogic = (
     const value = e.target.value;
     setQuery(value);
     setSelectedIndex(-1);
-    setIsOpen(value.trim().length >= 1);
+    setIsOpen(value.trim().length >= 1 || showSuggestionsOnEmptyFocus);
   };
 
   const handleSuggestionClick = (suggestion: SearchSuggestion) => {
@@ -64,9 +74,42 @@ export const useSearchLogic = (
       if (onSearch) {
         onSearch(suggestion.text);
       }
-    } else {
-      handleSearch(suggestion.text);
+      return;
     }
+
+    if (suggestion.type === "district" || suggestion.type === "location") {
+      const firstPart = suggestion.text.split(",")[0].trim();
+      const locSlug = firstPart
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      if (locSlug) {
+        router.push(`/colleges/location/${locSlug}`);
+        if (onSearch) {
+          onSearch(suggestion.text);
+        }
+        return;
+      }
+    }
+
+    if (suggestion.type === "course") {
+      const rawLower = suggestion.text.toLowerCase().trim();
+      let catSlug = rawLower.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      if (rawLower.includes("universit")) catSlug = "universities";
+      else if (rawLower.includes("art")) catSlug = "arts";
+      else if (rawLower.includes("engineer")) catSlug = "engineering";
+      else if (rawLower.includes("mba") || rawLower.includes("manage") || rawLower.includes("business")) catSlug = "mba";
+      else if (rawLower.includes("paramed")) catSlug = "paramedical";
+      else if (rawLower.includes("medical")) catSlug = "medical";
+
+      router.push(`/colleges/${catSlug}`);
+      if (onSearch) {
+        onSearch(suggestion.text);
+      }
+      return;
+    }
+
+    handleSearch(suggestion.text);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -109,7 +152,11 @@ export const useSearchLogic = (
   };
 
   const handleFocus = () => {
-    if (query.trim().length >= 1 || suggestions.length > 0) {
+    if (
+      query.trim().length >= 1 ||
+      suggestions.length > 0 ||
+      showSuggestionsOnEmptyFocus
+    ) {
       setIsOpen(true);
     }
   };

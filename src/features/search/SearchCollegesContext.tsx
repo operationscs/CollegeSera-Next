@@ -24,7 +24,7 @@ export function useSearchColleges(propColleges?: DatabaseCollege[]): DatabaseCol
   const [colleges, setColleges] = useState<DatabaseCollege[]>(resolvedInitial ?? []);
 
   useEffect(() => {
-    if (propColleges && propColleges.length > 0) {
+    if (propColleges !== undefined) {
       setColleges(propColleges);
       return;
     }
@@ -49,5 +49,9 @@ export function useSearchColleges(propColleges?: DatabaseCollege[]): DatabaseCol
     });
   }, [propColleges, ctxColleges]);
 
-  return propColleges ?? ctxColleges ?? colleges;
+  if (propColleges !== undefined) {
+    return propColleges;
+  }
+
+  return ctxColleges ?? colleges;
 }

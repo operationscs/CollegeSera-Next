@@ -18,7 +18,7 @@ const SectionHeader: React.FC<{ children: React.ReactNode; link?: string }> = ({
   children,
   link,
 }) => (
-  <h4 className="mb-2 border-b border-slate-50 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-700 dark:text-slate-400">
+  <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
     {link ? (
       <Link
         href={link}
@@ -388,7 +388,7 @@ export const ParamedicalMega = () => (
             </ParentLink>
           </li>
         </ul>
-        <h4 className="mb-2 mt-4 border-b border-slate-50 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-700">
+        <h4 className="mb-2 mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
           Popular Courses
         </h4>
         <ul className="space-y-2">

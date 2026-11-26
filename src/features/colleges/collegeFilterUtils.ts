@@ -22,6 +22,8 @@ const CITY_FILTER_ALIASES: Record<string, string[]> = {
   bengaluru: ["bangalore"],
   tiruchirappalli: ["trichy"],
   trichy: ["tiruchirappalli"],
+  kochi: ["ernakulam"],
+  ernakulam: ["kochi"],
 };
 
 export const GENERIC_SEO_TOKENS = new Set([
@@ -882,11 +884,26 @@ export function filterCollegesList(
           /engineering|technology|technical/.test((college.description || "").toLowerCase());
         if (!hasEngineeringTypeOrName && !hasEngineeringProgram) return false;
       } else if (catLower === "medical") {
+        const coursesText = (college.courses || [])
+          .map((course) => `${course.name || ""} ${course.specialization || ""}`)
+          .join(" ")
+          .toLowerCase();
         const hasMedicalOrDental =
           typeLower.includes("medical") ||
           nameLower.includes("medical") ||
           typeLower.includes("dental") ||
-          nameLower.includes("dental");
+          nameLower.includes("dental") ||
+          typeLower.includes("paramedical") ||
+          nameLower.includes("paramedical") ||
+          typeLower.includes("nursing") ||
+          nameLower.includes("nursing") ||
+          typeLower.includes("pharmacy") ||
+          nameLower.includes("pharmacy") ||
+          typeLower.includes("health") ||
+          nameLower.includes("health") ||
+          /\bmbbs\b|\bbds\b|\bmd\b|\bms\b|\bb\.?\s*pharm\b|\bnursing\b|\bbpt\b|\bdmlt\b/.test(
+            coursesText
+          );
         if (!hasMedicalOrDental) return false;
       } else if (
         catLower === "mba" ||
